@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Ratio Calculator</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 16px;
+      color: #1f1f1f;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .layout {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      width: 320px;
+      max-width: 100%;
+    }
+    .heading {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .heading h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid #e1e1e1;
+      margin: 0;
+    }
+    .group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .group label {
+      font-weight: 600;
+      color: #0f0f0f;
+    }
+    .group-body {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .group-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .input-stack {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .icon-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid #d4d4d4;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      cursor: pointer;
+      padding: 0;
+    }
+    .icon-button:hover:not(:disabled) {
+      background: #f6f6f6;
+    }
+    .icon-button:active:not(:disabled) {
+      background: #eaeaea;
+    }
+    .icon-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .icon {
+      font-size: 14px;
+      pointer-events: none;
+    }
+    .group select,
+    .group input {
+      height: 36px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #d4d4d4;
+      background: #fff;
+      font-size: 13px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .group select {
+      padding-right: 32px;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url('data:image/svg+xml,%3Csvg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1 1.25L5 4.75L9 1.25" stroke="%231F1F1F" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/%3E%3C/svg%3E');
+      background-repeat: no-repeat;
+      background-position: center right 12px;
+      background-size: 10px 6px;
+    }
+    .group select:focus,
+    .group input:focus {
+      outline: 2px solid #3c6df0;
+      outline-offset: 0;
+    }
+    .input--error {
+      border-color: #d92d20 !important;
+    }
+    .vertical-arrow {
+      display: flex;
+      justify-content: center;
+      font-size: 22px;
+      color: #1f1f1f;
+      margin: 4px 0;
+    }
+    .error-message {
+      min-height: 16px;
+      color: #d92d20;
+      font-size: 12px;
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .ratio-display {
+      font-weight: 500;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    button:not(.icon-button) {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    button:not(.icon-button):disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .primary {
+      background: #222;
+      color: #fff;
+    }
+    .primary:active:not(:disabled) {
+      background: #111;
+    }
+    .secondary {
+      background: transparent;
+      color: #333;
+      border: 1px solid #c5c5c5;
+    }
+    .secondary:active {
+      background: #f3f3f3;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="heading">
+      <h1>Ratio Calculator</h1>
+      <hr class="divider" />
+    </div>
+
+    <div class="group">
+      <label for="ratio-width">Input Ratio</label>
+      <select id="preset-select" aria-label="Choose preset aspect ratio">
+        <option value="" disabled selected>Choose preset aspect ratio</option>
+        <option value="1:1">1:1 Square</option>
+        <option value="3:2">3:2 Landscape</option>
+        <option value="2:3">2:3 Portrait</option>
+        <option value="4:3">4:3 Standard</option>
+        <option value="3:4">3:4 Portrait</option>
+        <option value="5:4">5:4 Large Format</option>
+        <option value="4:5">4:5 Large Format</option>
+        <option value="16:9">16:9 HD</option>
+        <option value="9:16">9:16 Vertical</option>
+        <option value="1.91:1">1.91:1 Social</option>
+        <option value="2:1">2:1 Cinema</option>
+        <option value="1.618:1">1.618:1 Golden</option>
+        <option value="3:1">3:1 Panorama</option>
+        <option value="21:9">21:9 Ultra-wide</option>
+        <option value="1.85:1">1.85:1 Cinema</option>
+        <option value="2.39:1">2.39:1 CinemaScope</option>
+      </select>
+      <div class="group-body">
+        <div class="input-stack">
+          <input id="ratio-width" type="text" inputmode="decimal" autocomplete="off" placeholder="Width" />
+          <input id="ratio-height" type="text" inputmode="decimal" autocomplete="off" placeholder="Height" />
+        </div>
+        <div class="group-actions">
+          <button id="swap-input-ratio" class="icon-button" type="button" aria-label="Swap input ratio">
+            <span class="icon">&#8645;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="vertical-arrow">&#8595;</div>
+
+    <div class="group">
+      <label for="output-width">Output Ratio</label>
+      <div class="group-body">
+        <div class="input-stack">
+          <input id="output-width" type="text" inputmode="decimal" autocomplete="off" placeholder="Width" />
+          <input id="output-height" type="text" inputmode="decimal" autocomplete="off" placeholder="Height" />
+        </div>
+        <div class="group-actions">
+          <button id="swap-output-ratio" class="icon-button" type="button" aria-label="Swap output ratio">
+            <span class="icon">&#8645;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="error-message" class="error-message"></div>
+    <div class="footer">
+      <div id="ratio-display" class="ratio-display">Ratio not set</div>
+      <div class="actions">
+        <button id="clear-button" class="secondary" type="button">Clear</button>
+        <button id="apply-button" class="primary" type="button" disabled>Apply ratio</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      const ratioWidthInput = document.getElementById('ratio-width');
+      const ratioHeightInput = document.getElementById('ratio-height');
+      const outputWidthInput = document.getElementById('output-width');
+      const outputHeightInput = document.getElementById('output-height');
+      const applyButton = document.getElementById('apply-button');
+      const clearButton = document.getElementById('clear-button');
+      const errorMessage = document.getElementById('error-message');
+      const ratioDisplay = document.getElementById('ratio-display');
+      const presetSelect = document.getElementById('preset-select');
+      const swapInputButton = document.getElementById('swap-input-ratio');
+      const swapOutputButton = document.getElementById('swap-output-ratio');
+
+      const PRESET_RATIOS = [
+        { value: '1:1', width: 1, height: 1 },
+        { value: '3:2', width: 3, height: 2 },
+        { value: '2:3', width: 2, height: 3 },
+        { value: '4:3', width: 4, height: 3 },
+        { value: '3:4', width: 3, height: 4 },
+        { value: '5:4', width: 5, height: 4 },
+        { value: '4:5', width: 4, height: 5 },
+        { value: '16:9', width: 16, height: 9 },
+        { value: '9:16', width: 9, height: 16 },
+        { value: '1.91:1', width: 1.91, height: 1 },
+        { value: '2:1', width: 2, height: 1 },
+        { value: '1.618:1', width: 1.618, height: 1 },
+        { value: '3:1', width: 3, height: 1 },
+        { value: '21:9', width: 21, height: 9 },
+        { value: '1.85:1', width: 1.85, height: 1 },
+        { value: '2.39:1', width: 2.39, height: 1 },
+      ];
+
+      const presetLookup = new Map(PRESET_RATIOS.map(preset => [preset.value, preset]));
+
+      let lastEditedOutput = null;
+      let currentError = '';
+      let internalChange = false;
+
+      function setInputValue(input, value) {
+        internalChange = true;
+        input.value = value !== null && value !== undefined ? String(value) : '';
+        internalChange = false;
+      }
+
+      function parseNumber(value) {
+        const trimmed = value.trim();
+        if (!trimmed) {
+          return null;
+        }
+        const parsed = Number(trimmed);
+        return Number.isFinite(parsed) ? parsed : null;
+      }
+
+      function isPositiveNumber(value) {
+        return typeof value === 'number' && !Number.isNaN(value) && value > 0;
+      }
+
+      function roundToFour(value) {
+        return Math.round(value * 10000) / 10000;
+      }
+
+      function formatWithPrecision(value, precision) {
+        const multiplier = Math.pow(10, precision);
+        const rounded = Math.round(value * multiplier) / multiplier;
+        return rounded
+          .toFixed(precision)
+          .replace(/\.0+$/, '')
+          .replace(/(\.[0-9]*[1-9])0+$/, '$1');
+      }
+
+      function formatRatioInput(value) {
+        return formatWithPrecision(value, 4);
+      }
+
+      function formatRatioDisplayNumber(value) {
+        return formatWithPrecision(value, 2);
+      }
+
+      function formatOutputValue(value) {
+        return String(Math.round(value));
+      }
+
+      function updatePresetSelectionFromRatio() {
+        if (!presetSelect) {
+          return;
+        }
+        const ratio = getRatioValues();
+        if (!ratio || !isPositiveNumber(ratio.width) || !isPositiveNumber(ratio.height)) {
+          presetSelect.value = '';
+          return;
+        }
+        const ratioValue = ratio.width / ratio.height;
+        const tolerance = 0.01;
+        let bestMatch = '';
+        let bestError = Number.POSITIVE_INFINITY;
+        PRESET_RATIOS.forEach(preset => {
+          const presetRatio = preset.width / preset.height;
+          const error = Math.abs(presetRatio - ratioValue);
+          if (error <= tolerance && error < bestError) {
+            bestMatch = preset.value;
+            bestError = error;
+          }
+        });
+        presetSelect.value = bestMatch;
+      }
+
+      function handleSwapRatioInputs() {
+        const widthText = ratioWidthInput.value;
+        const heightText = ratioHeightInput.value;
+        setInputValue(ratioWidthInput, heightText);
+        setInputValue(ratioHeightInput, widthText);
+        handleRatioInput();
+      }
+
+      function handleSwapOutputInputs() {
+        const widthText = outputWidthInput.value;
+        const heightText = outputHeightInput.value;
+        const widthValue = parseNumber(widthText);
+        const heightValue = parseNumber(heightText);
+
+        if (isPositiveNumber(widthValue) && isPositiveNumber(heightValue)) {
+          setInputValue(outputWidthInput, formatOutputValue(heightValue));
+          setInputValue(outputHeightInput, formatOutputValue(widthValue));
+        } else {
+          setInputValue(outputWidthInput, heightText);
+          setInputValue(outputHeightInput, widthText);
+        }
+
+        clearErrors();
+        lastEditedOutput = 'width';
+        if (outputWidthInput.value.trim() && outputHeightInput.value.trim()) {
+          updateRatioFromOutputs();
+        } else {
+          updateRatioDisplay();
+          updatePresetSelectionFromRatio();
+        }
+        updateApplyButtonState();
+      }
+
+      function clearErrors() {
+        currentError = '';
+        errorMessage.textContent = '';
+        [ratioWidthInput, ratioHeightInput, outputWidthInput, outputHeightInput].forEach(input => {
+          input.classList.remove('input--error');
+        });
+      }
+
+      function setError(message, inputs = []) {
+        currentError = message;
+        errorMessage.textContent = message;
+        const targets = Array.isArray(inputs) ? inputs : [inputs];
+        [ratioWidthInput, ratioHeightInput, outputWidthInput, outputHeightInput].forEach(input => {
+          if (!targets.includes(input)) {
+            input.classList.remove('input--error');
+          }
+        });
+        targets.forEach(input => input.classList.add('input--error'));
+      }
+
+      function updateApplyButtonState() {
+        const widthValue = parseNumber(outputWidthInput.value);
+        const heightValue = parseNumber(outputHeightInput.value);
+        const bothPresent = outputWidthInput.value.trim() && outputHeightInput.value.trim();
+        const valid = isPositiveNumber(widthValue) && isPositiveNumber(heightValue) && !currentError;
+        applyButton.disabled = !(bothPresent && valid);
+      }
+
+      function calculateGcd(a, b) {
+        let x = Math.abs(a);
+        let y = Math.abs(b);
+        if (!x || !y) {
+          return 0;
+        }
+        const precision = 1e-8;
+        while (y > precision) {
+          const quotient = Math.trunc(x / y);
+          const remainder = x - quotient * y;
+          x = y;
+          y = Math.abs(remainder);
+        }
+        return x;
+      }
+
+      function approximateIntegerRatio(width, height) {
+        const maxDenominator = 512;
+        const tolerance = 0.005;
+        if (!isPositiveNumber(width) || !isPositiveNumber(height)) {
+          return null;
+        }
+        const ratio = width / height;
+        let best = null;
+        for (let denominator = 1; denominator <= maxDenominator; denominator += 1) {
+          const numerator = Math.round(ratio * denominator);
+          if (numerator === 0) {
+            continue;
+          }
+          const approx = numerator / denominator;
+          const error = Math.abs(approx - ratio);
+          if (error <= tolerance) {
+            const gcd = calculateGcd(numerator, denominator) || 1;
+            const simplifiedNumerator = Math.round(numerator / gcd);
+            const simplifiedDenominator = Math.round(denominator / gcd);
+            if (!best || simplifiedNumerator + simplifiedDenominator < best.sum ||
+                (simplifiedNumerator + simplifiedDenominator === best.sum && error < best.error)) {
+              best = {
+                width: simplifiedNumerator,
+                height: simplifiedDenominator,
+                sum: simplifiedNumerator + simplifiedDenominator,
+                error,
+              };
+            }
+          }
+        }
+        return best ? { width: best.width, height: best.height } : null;
+      }
+
+      function simplifyRatio(width, height) {
+        const integerApprox = approximateIntegerRatio(width, height);
+        if (integerApprox) {
+          return integerApprox;
+        }
+        const gcd = calculateGcd(width, height);
+        const epsilon = 1e-6;
+        if (gcd && gcd > 1 + epsilon) {
+          return {
+            width: roundToFour(width / gcd),
+            height: roundToFour(height / gcd),
+          };
+        }
+        const smallest = Math.min(width, height);
+        if (!smallest) {
+          return { width, height };
+        }
+        return {
+          width: roundToFour(width / smallest),
+          height: roundToFour(height / smallest),
+        };
+      }
+
+      function getRatioValues() {
+        const ratioWidth = parseNumber(ratioWidthInput.value);
+        const ratioHeight = parseNumber(ratioHeightInput.value);
+        if (isPositiveNumber(ratioWidth) && isPositiveNumber(ratioHeight)) {
+          return { width: ratioWidth, height: ratioHeight };
+        }
+        return null;
+      }
+
+      function updateRatioDisplay() {
+        const ratio = getRatioValues();
+        if (ratio) {
+          const left = formatRatioDisplayNumber(ratio.width);
+          const right = formatRatioDisplayNumber(ratio.height);
+          ratioDisplay.innerHTML = '<strong>' + left + '</strong>:' + right + ' Ratio';
+        } else {
+          ratioDisplay.textContent = 'Ratio not set';
+        }
+      }
+
+      function recalculateOppositeOutput(changedField) {
+        const ratio = getRatioValues();
+        if (!ratio) {
+          return;
+        }
+        const widthValue = parseNumber(outputWidthInput.value);
+        const heightValue = parseNumber(outputHeightInput.value);
+        if (changedField === 'width' && isPositiveNumber(widthValue)) {
+          const newHeight = widthValue * (ratio.height / ratio.width);
+          setInputValue(outputHeightInput, formatOutputValue(newHeight));
+        }
+        if (changedField === 'height' && isPositiveNumber(heightValue)) {
+          const newWidth = heightValue * (ratio.width / ratio.height);
+          setInputValue(outputWidthInput, formatOutputValue(newWidth));
+        }
+      }
+
+      function updateRatioFromOutputs() {
+        const widthValue = parseNumber(outputWidthInput.value);
+        const heightValue = parseNumber(outputHeightInput.value);
+        if (isPositiveNumber(widthValue) && isPositiveNumber(heightValue)) {
+          const ratio = simplifyRatio(widthValue, heightValue);
+          setInputValue(ratioWidthInput, formatRatioInput(ratio.width));
+          setInputValue(ratioHeightInput, formatRatioInput(ratio.height));
+          updateRatioDisplay();
+          updatePresetSelectionFromRatio();
+        }
+      }
+
+      function handleRatioInput() {
+        if (internalChange) {
+          return;
+        }
+        clearErrors();
+        const widthValue = parseNumber(ratioWidthInput.value);
+        const heightValue = parseNumber(ratioHeightInput.value);
+        const widthFilled = ratioWidthInput.value.trim() !== '';
+        const heightFilled = ratioHeightInput.value.trim() !== '';
+        const widthValid = !widthFilled || isPositiveNumber(widthValue);
+        const heightValid = !heightFilled || isPositiveNumber(heightValue);
+
+        if (!widthValid || !heightValid) {
+          setError('Ratio values must be positive numbers.', [ratioWidthInput, ratioHeightInput]);
+        } else if (isPositiveNumber(widthValue) && isPositiveNumber(heightValue)) {
+          recalculateOppositeOutput(lastEditedOutput);
+        }
+        updateRatioDisplay();
+        updatePresetSelectionFromRatio();
+        updateApplyButtonState();
+      }
+
+      function handlePresetChange() {
+        const value = presetSelect ? presetSelect.value : '';
+        if (!value) {
+          updatePresetSelectionFromRatio();
+          return;
+        }
+        const preset = presetLookup.get(value);
+        if (!preset) {
+          return;
+        }
+        clearErrors();
+        setInputValue(ratioWidthInput, formatRatioInput(preset.width));
+        setInputValue(ratioHeightInput, formatRatioInput(preset.height));
+        updateRatioDisplay();
+        updatePresetSelectionFromRatio();
+        const widthFilled = outputWidthInput.value.trim() !== '';
+        const heightFilled = outputHeightInput.value.trim() !== '';
+        let targetField = lastEditedOutput;
+        if (targetField !== 'width' && targetField !== 'height') {
+          targetField = widthFilled ? 'width' : heightFilled ? 'height' : null;
+        }
+        lastEditedOutput = targetField;
+        if (targetField === 'width' && widthFilled) {
+          recalculateOppositeOutput('width');
+        } else if (targetField === 'height' && heightFilled) {
+          recalculateOppositeOutput('height');
+        }
+        updateApplyButtonState();
+      }
+
+      function handleOutputInput(field) {
+        if (internalChange) {
+          return;
+        }
+        lastEditedOutput = field;
+        clearErrors();
+        const inputElement = field === 'width' ? outputWidthInput : outputHeightInput;
+        const rawValue = inputElement.value;
+        const parsedValue = parseNumber(rawValue);
+        const hasValue = rawValue.trim() !== '';
+        if (hasValue && !isPositiveNumber(parsedValue)) {
+          setError('Values must be positive numbers.', inputElement);
+        } else {
+          if (hasValue && isPositiveNumber(parsedValue)) {
+            setInputValue(inputElement, formatOutputValue(parsedValue));
+          }
+          const ratio = getRatioValues();
+          if (ratio) {
+            recalculateOppositeOutput(field);
+          } else {
+            updateRatioFromOutputs();
+          }
+        }
+        updateApplyButtonState();
+      }
+
+      function clearAllFields() {
+        setInputValue(ratioWidthInput, '');
+        setInputValue(ratioHeightInput, '');
+        setInputValue(outputWidthInput, '');
+        setInputValue(outputHeightInput, '');
+        if (presetSelect) {
+          presetSelect.value = '';
+        }
+        lastEditedOutput = null;
+        clearErrors();
+        updateRatioDisplay();
+        updatePresetSelectionFromRatio();
+        updateApplyButtonState();
+      }
+
+      ratioWidthInput.addEventListener('input', handleRatioInput);
+      ratioHeightInput.addEventListener('input', handleRatioInput);
+      outputWidthInput.addEventListener('input', () => handleOutputInput('width'));
+      outputHeightInput.addEventListener('input', () => handleOutputInput('height'));
+      if (presetSelect) {
+        presetSelect.addEventListener('change', handlePresetChange);
+      }
+      if (swapInputButton) {
+        swapInputButton.addEventListener('click', handleSwapRatioInputs);
+      }
+      if (swapOutputButton) {
+        swapOutputButton.addEventListener('click', handleSwapOutputInputs);
+      }
+
+      clearButton.addEventListener('click', () => {
+        clearAllFields();
+      });
+
+      applyButton.addEventListener('click', () => {
+        const widthValue = parseNumber(outputWidthInput.value);
+        const heightValue = parseNumber(outputHeightInput.value);
+        if (!isPositiveNumber(widthValue) || !isPositiveNumber(heightValue)) {
+          setError('Provide width and height before applying.', [outputWidthInput, outputHeightInput]);
+          updateApplyButtonState();
+          return;
+        }
+        parent.postMessage({ pluginMessage: { type: 'apply-ratio', width: widthValue, height: heightValue } }, '*');
+      });
+
+      window.onmessage = event => {
+        const message = event.data.pluginMessage;
+        if (!message || message.type !== 'selection-info') {
+          return;
+        }
+        const { width, height } = message;
+        clearAllFields();
+        if (typeof width === 'number' && typeof height === 'number') {
+          setInputValue(outputWidthInput, formatOutputValue(width));
+          setInputValue(outputHeightInput, formatOutputValue(height));
+          const ratio = simplifyRatio(width, height);
+          setInputValue(ratioWidthInput, formatRatioInput(ratio.width));
+          setInputValue(ratioHeightInput, formatRatioInput(ratio.height));
+          updateRatioDisplay();
+          updatePresetSelectionFromRatio();
+          lastEditedOutput = 'width';
+          recalculateOppositeOutput('width');
+        }
+        updateApplyButtonState();
+      };
+
+      parent.postMessage({ pluginMessage: { type: 'request-selection' } }, '*');
+    })();
+  </script>
+</body>
+</html>
